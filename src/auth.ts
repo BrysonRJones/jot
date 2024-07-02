@@ -1,4 +1,3 @@
-'use server';
 import { sql } from "@vercel/postgres";
 import NextAuth from "next-auth";
 import github from "next-auth/providers/github";

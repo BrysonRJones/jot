@@ -4,11 +4,7 @@ import { getNote } from "@/app/lib/data";
 import { Note } from "@/defs/note";
 import { useLayoutEffect, useState } from "react";
 
-interface EditNoteArgs {
-	id: string
-}
-
-export default async function EditNote(params: EditNoteArgs) {
+export default function EditNote({ params }: {params: {id: string}}) {
 	const id = params.id;
 	const [noteData, setNoteData] = useState<Note | undefined>(undefined);
 	useLayoutEffect(()=> {
