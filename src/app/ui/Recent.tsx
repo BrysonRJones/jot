@@ -6,7 +6,7 @@ export default function Recent() {
 		<div className="m-4 flex flex-row gap-2">
 			{
 				data.map((recent)=> {
-					return <RecentCard card={recent}/>
+					return <RecentCard card={recent} key={recent.title} />
 				})
 			}
 		</div>
