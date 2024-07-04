@@ -1,6 +1,6 @@
-'use client'
+'use client';
 import { CreateAccountState, createAccount } from "@/app/lib/actions";
-import { useActionState, useId } from "react"
+import { useId } from "react"
 import { useFormState } from "react-dom";
 
 export default function CreateAccountForm() {
@@ -18,10 +18,13 @@ export default function CreateAccountForm() {
 			<div className="flex flex-col">
 				<label htmlFor={emailID}>Email</label>
 				<input className="border-solid border-2 border-violet-600" id={emailID} type="email" name='email'/>
+				<p className="text-red-500">{state?.errors?.email}</p>
 				<label htmlFor={passwordID}>Password</label>
-				<input className="border-solid border-2 border-violet-600" id={passwordID} name='password'/>
+				<input className="border-solid border-2 border-violet-600" id={passwordID} name='password' type="password"/>
+				<p>{state?.errors?.password}</p>
 				<label htmlFor={confirmPasswordID}>Confirm password</label>
-				<input className="border-solid border-2 border-violet-600" id={confirmPasswordID} name='confirmPassword'/>
+				<input className="border-solid border-2 border-violet-600" id={confirmPasswordID} name='confirmPassword' type="password" />
+				<p className="text-red-500">{state?.errors?.confirmPassword}</p>
 			</div>
 			<button className="bg-violet-700 flex-none h-12 text-white" type="submit">Submit</button>
 		</form>

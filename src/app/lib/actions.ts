@@ -18,42 +18,50 @@ export async function authenticate(
 	catch (error) {
 		if (error instanceof AuthError) {
 			switch (error.type) {
+				case "CallbackRouteError":
 				case "CredentialsSignin":
 					return 'Invalid credentials';
 				default:
 					return 'Something went wrong';
 			}
 		}
-		throw error;
+		else 
+		{
+			return undefined;
+		}
 	}
+	redirect("/home");
 }
 
 const CreateAccountSchema = z.object({
-	userID: z.string({invalid_type_error: "Please use a valid email"}).email(),
+	email: z.string({invalid_type_error: "Please use a valid email"}).email(),
 	password: z.string({invalid_type_error: "Please provide a password"}),
 	confirmPassword: z.string({invalid_type_error: "Please confirm the chosen password"}),
 });
 
 export type CreateAccountState = {
 	errors?: {
-		userID?: string[];
+		email?: string[];
 		password?: string[];
-		confirmPasword?: string[];
+		confirmPassword?: string[];
 	};
 	message?: string | null;
 }
 
-async function verifyUnique(userID: string) {
+async function verifyUnique(email: string) {
 	const users = await sql`
+		SELECT email
 		FROM users
-		SELECT user_id
-		WHERE user_id=${userID}
+		WHERE email=${email}
 	`
-	if (!(users?.rowCount ?? 0 > 0)) {
+	if ((users?.rowCount ?? 0 > 0)) {
 		return {
-			errors: {userID: ["This email is currently in use."]},
+			errors: {email: ["This email is currently in use."]},
 			message: "Failed to create account"
 		}
+	}
+	else {
+		return { errors: undefined, message: null};
 	}
 }
 
@@ -65,7 +73,7 @@ export async function createAccount(
 ) {
 	try {
 		const validatedData = CreateAccountSchema.safeParse({
-			userID: formData.get('userID'),
+			email: formData.get('email'),
 			password: formData.get('password'),
 			confirmPassword: formData.get('confirmPassword')
 		});
@@ -78,7 +86,7 @@ export async function createAccount(
 			}
 		}
 
-		const state: CreateAccountState | undefined | null = await verifyUnique(validatedData.data.userID)
+		const state: CreateAccountState | undefined | null = await verifyUnique(validatedData.data.email)
 		if (state?.errors) {
 			return state;
 		}
@@ -89,18 +97,16 @@ export async function createAccount(
 			}
 		}
 		const hashPass = await bcrypt.hash(validatedData.data.password, 10);
-
-		await sql`
-			INSERT INTO users (user_id, password, date_created)
-			VALUES(${validatedData.data.userID}, ${hashPass}, ${dateCreated})
+		const add = await sql`
+			INSERT INTO users (email, name, password, date_created)
+			VALUES(${validatedData.data.email}, ${""}, ${hashPass}, ${dateCreated})
 		`
-
-		redirect("/home");
+		
 	}
 	catch (error) {
-		console.log(error);
 		throw Error("Account couldn't be created at this time")
 	}
+	redirect("/login");
 }
 
 export async function createNote(userID: string) {
