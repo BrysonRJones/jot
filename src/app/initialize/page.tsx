@@ -1,8 +1,8 @@
+import { main } from "./seed";
 
 export default async function Initialize() {
-	return (
-		<div>
-			Initializing database. Please check the console to view progress.
-		</div>
-	)
+  main();
+  return (
+    <div>Initializing database. Please check the console to view progress.</div>
+  );
 }
